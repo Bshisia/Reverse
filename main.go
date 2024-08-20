@@ -11,10 +11,16 @@ func main() {
 		return
 	}
 	arg := os.Args[1]
-	banner := os.Args[2]
+	banner := ""
+	if len(os.Args) == 2 {
+		banner = "standard.txt"
+	} else if len(os.Args) == 3 {
+		banner = os.Args[2]
+	}
 	if !strings.Contains(arg, "--reverse=") {
 		return
 	}
+
 	bannerFile, err := ReadFile(banner)
 	if err {
 		return
@@ -31,9 +37,6 @@ func main() {
 			if CheckPattern(val, file) {
 				str += string(rune(i + 32))
 				file = TrimFound(len(val[0]), file)
-			} else {
-				fmt.Println("Pattern not found")
-				return
 			}
 		}
 	}
@@ -73,7 +76,7 @@ func CheckPattern(char, word []string) bool {
 
 func TrimFound(length int, word []string) []string {
 	for i, val := range word[0 : len(word)-1] {
-		fmt.Println(val[length:])
+		// fmt.Println(val[length:])
 		word[i] = val[length:]
 	}
 	return word
