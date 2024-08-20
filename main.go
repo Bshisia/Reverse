@@ -7,30 +7,37 @@ import (
 )
 
 func main() {
-	if len(os.Args) < 1 {
+	if len(os.Args) < 2 {
 		return
 	}
-	arg := os.Args[1:]
-	if !strings.Contains(arg[0], "--reverse=") {
+	arg := os.Args[1]
+	banner := os.Args[2]
+	if !strings.Contains(arg, "--reverse=") {
 		return
 	}
-	bannerFile, err := ReadFile(arg[1])
+	bannerFile, err := ReadFile(banner)
 	if err {
 		return
 	}
 	slicedBanner := SliceFile(bannerFile)
-	file, err := ReadFile(arg[0][10:])
+	file, err := ReadFile(arg[10:])
 	if err {
 		return
 	}
-	arg := ""
-	for len(file) > 0 {
+
+	str := ""
+	for len(file[0]) > 0 {
 		for i, val := range slicedBanner {
 			if CheckPattern(val, file) {
 				str += string(rune(i + 32))
+				file = TrimFound(len(val[0]), file)
+			} else {
+				fmt.Println("Pattern not found")
+				return
 			}
 		}
 	}
+	fmt.Println(str)
 }
 
 func ReadFile(fileName string) ([]string, bool) {
@@ -53,14 +60,21 @@ func SliceFile(fileSlice []string) [][]string {
 }
 
 func CheckPattern(char, word []string) bool {
-	present := true
-	if len(char[0]) > len(word) {
+	if len(char[0]) > len(word[0]) {
 		return false
 	}
-	for i, str := range word[0 : len(word)-1] {
+	for i, str := range word[:len(word)-1] {
 		if char[i] != str[:len(char[i])] {
-			present = false
+			return false
 		}
 	}
-	return present
+	return true
+}
+
+func TrimFound(length int, word []string) []string {
+	for i, val := range word[0 : len(word)-1] {
+		fmt.Println(val[length:])
+		word[i] = val[length:]
+	}
+	return word
 }
